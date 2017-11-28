@@ -14,69 +14,87 @@
 # data in text files (YAML, JSON).
 # If you have even more courage, try implementing user interface.
 
-class Class:
-	def __init__(self, name):
-		self.name = name
-        self.attendance = 0
-        self.scores = [] 
+import json
 
-	def add_attendance(self, attendance):
-		self.attendance = attendance
-
-	def add_score(self, score):
-		self.scores.append(score)
-
-	def get_average_score(self):
-		sum = 0
-		for i in self.average.scores:
-			sum += i
-		return sum/len(self.average.scores)
-
-	def get_attendance(self):
-		sum = 0
-		for i in self.average.scores:
-			sum += i
-		return sum/len(self.average.scores)
-		
-
-class Student:
-	def __init__(self, name, surname):
-        self.name = name
-        self.surname = surname
-        self.classes = []
-
-	def add_class(self, class_name):
-		class_1 = Class(class_name)
-		self.classes.append(class_1)
-
-	def get_average_score_in_class(self, class_name):
-		total_sum = 0
-		for i in range(len(self.classes)):
-			if self.classes[i].name == class_name:
-				total_sum += self.classes[i].get_average_score()
-		return total_sum/len(self.classes)
-	
-		
-		
 class Diary:
-	def __init__(self, group_name):
-        self.group_name = group_name
-		self.students = []
-        
-	def add_student(self, student_name, student_surname):
-		student_1 = Student(student_name, student_surname)
-		self.students.append(student_1)
-        
-	def get_average_scores_in_class(self, class_name):
-		total_sum = 0
-		for i in range(len(self.students)):
-			total_sum += self.students[i].get_average_score_in_class(class_name)
-		return total_sum/len(self.students)
+    def __init__(self, name):
+        self.class_name = name
+        self.students = {}
 
-	def get_total_average_score_of_student(self, student_name, student_surname):
-		total_sum = 0
-		for i in range(len(self.students)):
-			if self.students[i].name == student_name && self.students[i].surname == student_surname:
-				for j in range(self.students[i].classes)
-					total_sum += elf.students[i].classes[j].get_average_score()
-				return total_sum/len(self.students[i].classes)
+    def add_student(self, name, surname):
+        student = {'Student': str(name) + " " + str(surname), 'Classes': {}}
+        self.students[str(name) + " " + str(surname)] = student
+
+    def add_class(self, student_name, class_name):
+        class_1 = {'Attendance': 0, 'Class_number': 0, 'Scores': []}
+        self.students[str(student_name)]['Classes'][class_name] = class_1
+
+    def add_student_score_in_class(self, student_name, class_name, score):
+        self.students[str(student_name)]['Classes'][class_name]['Scores'].append(score)
+
+    def add_student_attendance_in_class(self, student_name, class_name):
+        self.students[str(student_name)]['Classes'][class_name]['Attendance'] += 1
+        self.students[str(student_name)]['Classes'][class_name]['Class_number'] += 1
+
+    def add_student_absence_in_class(self, student_name, class_name):
+        self.students[str(student_name)]['Classes'][class_name]['Class_number'] += 1
+
+    def get_total_average_score_in_class(self, class_name):
+        sum1 = 0
+        total = 0
+        for key in self.students:
+            sum1 += sum(self.students[key]['Classes'][class_name]['Scores'])
+            total += len(self.students[key]['Classes'][class_name]['Scores'])
+        return sum1/total
+
+    def get_total_attendance_of_student(self, student_name):
+        sum1 = 0
+        total = 0
+        for key in self.students[student_name]['Classes']:
+            sum1 += self.students[student_name]['Classes'][key]['Attendance']
+            total += self.students[student_name]['Classes'][key]['Class_number']
+        return str((sum1*100)/total) + " %"
+
+    def get_student_average_score_in_class(self, student_name , class_name):
+        return sum(self.students[student_name]['Classes'][class_name]['Scores']) / len(self.students[student_name]['Classes'][class_name]['Scores'])
+
+    def write_diary_to_json(self, file_name):
+        with open(file_name, 'w') as f1:
+            json.dump(self.students, f1)
+            f1.close()
+
+
+
+
+c1 = Diary("2a")
+c1.add_student("Janek", "Kowalski")
+c1.add_student("Ania", "Nowak")
+
+c1.add_class("Janek Kowalski", "English")
+c1.add_class("Ania Nowak", "English")
+c1.add_class("Janek Kowalski", "Maths")
+c1.add_class("Ania Nowak", "Maths")
+c1.add_student_score_in_class("Janek Kowalski", "English", 5)
+c1.add_student_score_in_class("Janek Kowalski", "English", 4)
+c1.add_student_score_in_class("Janek Kowalski", "English", 3)
+c1.add_student_score_in_class("Ania Nowak", "English", 5)
+c1.add_student_score_in_class("Ania Nowak", "English", 5)
+c1.add_student_score_in_class("Janek Kowalski", "Maths", 4)
+c1.add_student_score_in_class("Janek Kowalski", "Maths", 4)
+c1.add_student_score_in_class("Janek Kowalski", "Maths", 3)
+c1.add_student_score_in_class("Ania Nowak", "Maths", 3)
+c1.add_student_score_in_class("Ania Nowak", "Maths", 3)
+
+c1.add_student_absence_in_class("Janek Kowalski", "Maths")
+c1.add_student_absence_in_class("Janek Kowalski", "English")
+c1.add_student_attendance_in_class("Janek Kowalski", "Maths")
+c1.add_student_attendance_in_class("Ania Nowak", "Maths")
+c1.add_student_attendance_in_class("Ania Nowak", "English")
+c1.add_student_attendance_in_class("Ania Nowak", "Maths")
+
+
+print("Total attendance of Janek Kowalski: ",c1.get_total_attendance_of_student("Janek Kowalski"))
+print("Average score in Maths of Janek Kowalski: ", c1.get_student_average_score_in_class("Janek Kowalski", "Maths" ))
+print("Average score in English: ", c1.get_total_average_score_in_class('English'))
+
+c1.write_diary_to_json("diary1.json")
